@@ -14,6 +14,8 @@ Simple_MPU6050 mpu;
 /*             _________________________________________________________*/
 //               X Accel  Y Accel  Z Accel   X Gyro   Y Gyro   Z Gyro
 //#define OFFSETS  -5260,    6596,    7866,     -45,       5,      -9  // My Last offsets. 
+//              X Accel  Y Accel  Z Accel   X Gyro   Y Gyro   Z Gyro
+#define OFFSETS  -5584,    -400,    1240,     108,      77,      -6
 //       You will want to use your own as these are only for my specific MPU6050.
 /*             _________________________________________________________*/
 
@@ -173,12 +175,11 @@ int PrintWorldAccel(int16_t *accel, int32_t *quat, uint16_t SpamDelay = 100) {
 
 void print_Values (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestamp) {
   uint8_t Spam_Delay = 100; // Built in Blink without delay timer preventing Serial.print SPAM
-
   // PrintValues(quat, Spam_Delay);
   // ChartValues(quat, Spam_Delay);
-  PrintAllValues(gyro, accel, quat, Spam_Delay);
+  // PrintAllValues(gyro, accel, quat, Spam_Delay);
   // ChartAllValues(gyro, accel, quat, Spam_Delay);
-  // PrintQuaternion(quat, Spam_Delay);
+   PrintQuaternion(quat, Spam_Delay);
   // PrintEuler(quat, Spam_Delay);
   // PrintRealAccel(accel, quat,  Spam_Delay);
   // PrintWorldAccel(accel, quat, Spam_Delay);
@@ -219,4 +220,6 @@ void setup() {
 
 void loop() {
   mpu.dmp_read_fifo();// Must be in loop
+  mpu.OverflowProtection();
+ // delay(1000);
 }
