@@ -10,6 +10,13 @@
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW
 
 Simple_MPU6050 mpu;
+TaskHandle_t mpuRunningTask;
+void mpuRunningTaskCode( void * parameter) {
+  for(;;) {
+    mpu.dmp_read_fifo();// Must be in loop
+    mpu.OverflowProtection();
+  }
+}
 //ENABLE_MPU_OVERFLOW_PROTECTION();
 /*             _________________________________________________________*/
 //               X Accel  Y Accel  Z Accel   X Gyro   Y Gyro   Z Gyro
@@ -216,10 +223,19 @@ void setup() {
   mpu.SetAddress(MPU6050_ADDRESS_AD0_LOW).CalibrateMPU().load_DMP_Image();// Does it all for you with Calibration
 #endif
   mpu.on_FIFO(print_Values);
+
+  // https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
+  xTaskCreatePinnedToCore(
+      mpuRunningTaskCode, /* Function to implement the task */
+      "Task1", /* Name of the task */
+      10000,  /* Stack size in words */
+      NULL,  /* Task input parameter */
+      1,  /* Priority of the task */
+      &mpuRunningTask,  /* Task handle. */
+      1); /* Core where the task should run */
 }
 
 void loop() {
-  mpu.dmp_read_fifo();// Must be in loop
-  mpu.OverflowProtection();
- // delay(1000);
+  delay(1000);
+  Serial.println(mpu.gyro[0]);
 }
